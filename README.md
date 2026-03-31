@@ -26,5 +26,5 @@ Visit the live demo: [Your Vercel URL will appear here]
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/SANGAVI-KRISH/EventHandling.git
+git clone https://github.com/SANGAVI-KRISH/Event-Handling-React.git
 cd react-event-demo

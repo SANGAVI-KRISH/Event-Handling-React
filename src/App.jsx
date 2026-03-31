@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import './App.css';
 
 const EventDemoApp = () => {
@@ -136,10 +136,11 @@ const EventDemoApp = () => {
   
   const handleWheel = (e) => {
     const direction = e.deltaY > 0 ? 'down ⬇️' : 'up ⬆️';
+    const newWheelValue = wheelValue + (e.deltaY > 0 ? 1 : -1);
     setWheelDirection(direction);
-    setWheelValue(prev => prev + (e.deltaY > 0 ? 1 : -1));
-    addLog('Mouse', 'onWheel', `- Delta: ${e.deltaY > 0 ? 'down' : 'up'}`);
-    showNotification(`🖱️ Scrolling ${direction}`, 'info');
+    setWheelValue(newWheelValue);
+    addLog('Mouse', 'onWheel', `- Delta: ${e.deltaY > 0 ? 'down' : 'up'}, Total: ${newWheelValue}`);
+    showNotification(`🖱️ Scrolling ${direction} (Total: ${newWheelValue})`, 'info');
     
     // Visual feedback on scroll
     const area = e.currentTarget;
@@ -229,7 +230,7 @@ const EventDemoApp = () => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-    addLog('Touch', 'onTouchStart', `- Position: (${x}, ${y})`);
+    addLog('Touch', 'onTouchStart', `- Position: (${Math.round(x)}, ${Math.round(y)})`);
     showNotification(`👆 Touch started at (${Math.round(x)}, ${Math.round(y)})`, 'info');
     
     // Visual feedback
@@ -246,7 +247,7 @@ const EventDemoApp = () => {
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
     if (Math.random() > 0.8) {
-      addLog('Touch', 'onTouchMove', `- Moved to: (${x}, ${y})`);
+      addLog('Touch', 'onTouchMove', `- Moved to: (${Math.round(x)}, ${Math.round(y)})`);
     }
     
     // Update position display
@@ -294,6 +295,18 @@ const EventDemoApp = () => {
     if (Math.random() > 0.95) {
       addLog('UI', 'onScroll', `- Position: ${position}px`);
     }
+  };
+
+  // Clear all logs and reset counters
+  const clearAllLogs = () => {
+    setMouseEventLog([]);
+    setKeyEventLog([]);
+    setTouchLog([]);
+    setClickCount(0);
+    setWheelValue(0);
+    setWheelDirection('');
+    setLastClickType('');
+    showNotification('✨ All logs and counters cleared!', 'success');
   };
 
   return (
@@ -356,6 +369,10 @@ const EventDemoApp = () => {
                   <span className="stat-value">{wheelDirection || '—'}</span>
                 </div>
                 <div className="stat">
+                  <span className="stat-label">Wheel Counter:</span>
+                  <span className="stat-value">{wheelValue}</span>
+                </div>
+                <div className="stat">
                   <span className="stat-label">Mouse Status:</span>
                   <span className={`status-badge ${isMouseDown ? 'active' : ''}`}>
                     {isMouseDown ? '⬇️ PRESSED' : '⬆️ RELEASED'}
@@ -371,7 +388,7 @@ const EventDemoApp = () => {
                   <li>✅ <strong>Double Click</strong> - Flash effect!</li>
                   <li>✅ <strong>Hold mouse down</strong> - Button changes color</li>
                   <li>✅ <strong>Move mouse</strong> - See position tracking</li>
-                  <li>✅ <strong>Scroll wheel</strong> - Area scales!</li>
+                  <li>✅ <strong>Scroll wheel</strong> - Area scales and counter increases!</li>
                   <li>✅ <strong>Hover</strong> - Glow effect activates</li>
                 </ul>
               </div>
@@ -520,7 +537,7 @@ const EventDemoApp = () => {
             <div className="scroll-content">
               <div className="scroll-header">
                 <span>📊 Scroll Position: {scrollPosition}px</span>
-                <div className="scroll-bar-indicator" style={{ width: `${(scrollPosition / 500) * 100}%` }}></div>
+                <div className="scroll-bar-indicator" style={{ width: `${Math.min((scrollPosition / 500) * 100, 100)}%` }}></div>
               </div>
               <p>👇 Scroll down to see the onScroll event in action! 👇</p>
               {[...Array(25)].map((_, i) => (
@@ -570,17 +587,10 @@ const EventDemoApp = () => {
           </div>
           
           <button 
-            onClick={() => {
-              setMouseEventLog([]);
-              setKeyEventLog([]);
-              setTouchLog([]);
-              setClickCount(0);
-              setWheelValue(0);
-              showNotification('✨ All logs cleared!', 'success');
-            }}
+            onClick={clearAllLogs}
             className="clear-logs-btn"
           >
-            🧹 Clear All Logs
+            🧹 Clear All Logs & Counters
           </button>
         </section>
       </div>
@@ -593,7 +603,7 @@ const EventDemoApp = () => {
           <div>✓ 5 Form Events - with live preview</div>
           <div>✓ 2 Focus Events - with indicators</div>
           <div>✓ 4 Touch Events - with touch tracking</div>
-          <div>✓ Wheel Event - with direction detection</div>
+          <div>✓ Wheel Event - with direction detection & counter</div>
           <div>✓ 3 Clipboard Events - with notifications</div>
           <div>✓ Scroll Event - with position tracking</div>
         </div>
